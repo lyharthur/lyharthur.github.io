@@ -1,23 +1,68 @@
-// 當圖片載入後才執行
-$(window).load(function(){
-	// 先取得先關區塊及圖片的寬高
-	// 並設定每張圖片的邊距
-	var $block = $('#Gallery'), 
-		$li = $block.find('li'), 
-		$img = $li.find('img'),
-		_width = $img.width(), 
-		_height = $img.height(), 
-		_margin = 10;
- 
-	// 把每一個 li 橫向排列好
-	$li.each(function(i) {
-		var $this = $(this), 
-			_left = i * (_width + _margin);
- 
-		// 先把排列後的位置記錄在 .data('position') 中
-		$this.css('left', _left).data('position', {
-			left: _left,
-			top: parseInt($this.css('top'), 10) || 0
-		});
-	})
-});
+(function($) {
+
+	skel.breakpoints({
+		wide: '(max-width: 1920px)',
+		normal: '(max-width: 1680px)',
+		narrow: '(max-width: 1280px)',
+		narrower: '(max-width: 1000px)',
+		mobile: '(max-width: 736px)',
+		mobilenarrow: '(max-width: 480px)',
+	});
+
+
+	$(function() {
+		// Gallery.
+		var	$window = $(window),
+			$body = $('body'),
+			$header = $('#header'),
+			$all = $body.add($header);
+
+			
+			$window.on('load', function() {
+				window.setTimeout(function() {
+					$body.removeClass('is-loading');
+				}, 0);
+			});
+					// Touch mode.
+			skel.on('change', function() {
+
+				if (skel.vars.mobile || skel.breakpoint('mobile').active)
+					$body.addClass('is-touch');
+				else
+					$body.removeClass('is-touch');
+
+			});
+
+		// Fix: Placeholder polyfill.
+			$('form').placeholder();
+
+		// Prioritize "important" elements on mobile.
+			skel.on('+mobile -mobile', function() {
+				$.prioritize(
+					'.important\\28 mobile\\29',
+					skel.breakpoint('mobile').active
+				);
+			});
+
+		// CSS polyfills (IE<9).
+			if (skel.vars.IEVersion < 9)
+				$(':last-child').addClass('last-child');
+
+			$window.on('load', function() {
+				$('.gallery').poptrox({
+					baseZIndex: 10001,
+					useBodyOverflow: false,
+					usePopupEasyClose: false,
+					overlayColor: '#1f2328',
+					overlayOpacity: 0.65,
+					usePopupDefaultStyling: false,
+					usePopupCaption: true,
+					popupLoaderText: '',
+					windowMargin: (skel.breakpoint('mobile').active ? 5 : 50),
+					usePopupNav: true
+				});
+			});
+	});
+	
+
+})(jQuery);
